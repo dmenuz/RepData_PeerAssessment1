@@ -1,13 +1,53 @@
 #Script for analyzing activity data
 
-##Reproducible Research Project 1 June 29, 2016
+#Reproducible Research Project 1 June 29, 2016
 
-###Download data, unzip, and read data
+##Loading and preprocessing the data
 
-setwd("C:\\Users\\diane\\Google Drive\\DianeSharedDrive\\DataScienceSpecialization\\gitRepo\\ReproducibleResearch")
+###Loading data
+setwd("C:\\Users\\diane\\Desktop\\gitRepo\\RepData_PeerAssessment1")
 datfile="https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 destfile="dat.zip"
 download.file(datfile, destfile)
-zipList=unzip(destfile, list=TRUE)
 unzip(destfile)
 act=read.csv("activity.csv")
+
+###Preprocessing data
+
+##What is mean total number of steps taken per day?
+
+#Data will be processed ignoring all of the missing values. First I will drop 
+#all of the NA values and calculate the number of steps taken per day
+act2=act[is.na(act$steps)==FALSE,]
+act2$date=factor(act2$date)
+dailySteps=tapply(act2$steps, list(act2$date), sum)
+summary(dailySteps)
+
+#Next I will present a histogram of the number of steps taken each day.
+
+hist(dailySteps, main="Histogram of activity", xlab="daily steps")
+
+#Last I will calculate the mean and median number of steps taken per day
+
+meanStep=mean(dailySteps)
+medianStep=median(dailySteps)
+
+#There was a mean of `r meanStep` and a median of `r medianStep` steps taken per
+#day.
+
+##What is the average daily activity pattern?
+
+#Time series plot of average steps per 5 minute intervals across all days
+
+avgInterval=aggregate(act2$steps, list(act2$interval),mean)
+plot(x~Group.1, data=avgInterval, type="l",xlab="minutes in day", 
+     ylab="average number of steps")
+
+maxSteps=max(avgInterval$x)
+maxInt=avgInterval$Group.1[avgInterval$x==maxSteps]
+
+#On average, interval `r maxInt` contains the maximum number of steps
+
+
+
+
